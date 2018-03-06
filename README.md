@@ -1,14 +1,34 @@
+# Filter plugin for transforming syslog messages to hanarp message format for [Fluentd](http://fluentd.org)
 
-# Contributing
+## Requirements
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
+| fluent-plugin-record-modifier  | fluentd | ruby |
+|--------------------------------|---------|------|
+| >= 1.0.0 | >= v0.14.0 | >= 2.1 |
+|  < 1.0.0 | >= v0.12.0 | >= 1.9 |
 
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+## Configuration
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+    <filter **>
+        @type hanarp_message
+        ucsHostNameKey SyslogSource
+    </filter>
+
+Will transform UCS syslog messages to hanarp messages to send to Service Bus Queue. It will look in the record hash for "SyslogSource" key to get hostname.
+Message format:
+
+    {
+        "timestamp": <timestamp>,
+        "event": "<event>",
+        "data": {
+            "machineId": "Cisco_UCS:<coloRegion>:<serviceProfileName>",
+            "hostname": "<hostname>",
+            "chassis": "<chassisSlot>",
+            "blade": "<bladeSlot>",
+            "serviceProfile": "<serviceProfileName>",
+            "stage": "<stage>",
+            "message": "<syslogMessage>"
+        }
+    }
+
+Plugin currently only expects syslog messages with either [FSM:BEGIN] or [FSM:END] tags and Power-on, Soft shutdown, Hard shutdown, or Power-cycle in the message. Please use the grep plugin to filter those messages out.
