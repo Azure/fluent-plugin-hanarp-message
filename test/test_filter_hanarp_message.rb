@@ -51,6 +51,7 @@ class AddServiceProfile < Test::Unit::TestCase
         assert_equal "4", data['data']['chassis']
         assert_equal "7", data['data']['blade']
         assert_equal "testServiceProfile", data['data']['serviceProfile']
+        assert_equal "begin", data['data']['stage']
         assert_equal "stopping", data['data']['state']
         
         assert_equal "Cisco_UCS:SJC2:testServiceProfile", filtered_records[0]['machineId']
@@ -75,6 +76,7 @@ class AddServiceProfile < Test::Unit::TestCase
         assert_equal "4", data['data']['chassis']
         assert_equal "7", data['data']['blade']
         assert_equal nil, data['data']['serviceProfile']
+        assert_equal "end", data['data']['stage']
         assert_equal "started", data['data']['state']
         
         assert_equal nil, filtered_records[0]['machineId']

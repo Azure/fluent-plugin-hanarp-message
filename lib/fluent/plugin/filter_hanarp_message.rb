@@ -84,6 +84,7 @@ module Fluent::Plugin
       @chassis = chassis
       @blade = blade
       @serviceProfile = serviceProfile
+      @stage = stage
       @message = message
 
       eventLower = event.downcase
@@ -102,6 +103,7 @@ module Fluent::Plugin
         chassis: @chassis,
         blade: @blade,
         serviceProfile: @serviceProfile,
+        stage: @stage,
         state: @state,
         message: @message
       }.to_json(*a)
