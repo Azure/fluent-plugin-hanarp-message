@@ -51,7 +51,7 @@ class AddServiceProfile < Test::Unit::TestCase
         assert_equal "4", data['data']['chassis']
         assert_equal "7", data['data']['blade']
         assert_equal "testServiceProfile", data['data']['serviceProfile']
-        assert_equal "begin", data['data']['stage']
+        assert_equal "stopping", data['data']['state']
         
         assert_equal "Cisco_UCS:SJC2:testServiceProfile", filtered_records[0]['machineId']
         assert_equal "1.1.1.1", filtered_records[0]['SyslogSource']
@@ -62,20 +62,20 @@ class AddServiceProfile < Test::Unit::TestCase
             { 
                 "message" => ": 2018 Feb  9 21:07:41 GMT: %UCSM-6-EVENT: [] [FSM:BEGIN]: Soft shutdown of server sys/chassis-4/blade-7",
                 "SyslogSource" => "1.1.1.1",
-                "event" => "Soft Shutdown",
-                "stage" => "begin"
+                "event" => "Restart",
+                "stage" => "end"
             }
         ]
         filtered_records = filter(messages)
         data = JSON.parse(filtered_records[0]['message'])
         
-        assert_equal "Soft Shutdown", data['event']
+        assert_equal "Restart", data['event']
         assert_equal nil, data['data']['machineId']
         assert_equal "1.1.1.1", data['data']['hostname']
         assert_equal "4", data['data']['chassis']
         assert_equal "7", data['data']['blade']
         assert_equal nil, data['data']['serviceProfile']
-        assert_equal "begin", data['data']['stage']
+        assert_equal "started", data['data']['state']
         
         assert_equal nil, filtered_records[0]['machineId']
         assert_equal "1.1.1.1", filtered_records[0]['SyslogSource']
