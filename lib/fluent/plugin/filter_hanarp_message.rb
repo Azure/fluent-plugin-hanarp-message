@@ -26,7 +26,7 @@ module Fluent::Plugin
         serviceProfile = machineId.split(":")[2]
       end
 
-      d = Data.new(machineId, host, chassis, blade, serviceProfile, stage, message)
+      d = Data.new(machineId, host, chassis, blade, serviceProfile, event, stage, message)
       m = Message.new(time, event, d)
       record["message"] = m.to_json
       record
@@ -50,7 +50,35 @@ module Fluent::Plugin
   end
 
   class Data
-    def initialize(machineId, hostname, chassis, blade, serviceProfile, stage, message)
+
+    # Events
+    SOFT_SHUTDOWN = "soft shutdown"
+    HARD_SHUTDOWN = "hard shutdown"
+    BOOT          = "boot"
+    RESTART       = "restart"
+    # Stages
+    STAGE_BEGIN = "begin"
+    STAGE_END   = "end"
+    # Machine States
+    STARTING   = "starting"
+    STARTED    = "started"
+    STOPPING   = "stopping"
+    STOPPED    = "stopped"
+    RESTARTING = "restarting"
+    UNKNOWN    = "unknown"
+
+    MACHINE_STATES = {
+      SOFT_SHUTDOWN+STAGE_BEGIN => STOPPING,
+      SOFT_SHUTDOWN+STAGE_END   => STOPPED,
+      HARD_SHUTDOWN+STAGE_BEGIN => STOPPING,
+      HARD_SHUTDOWN+STAGE_END   => STOPPED,
+      BOOT+STAGE_BEGIN          => STARTING,
+      BOOT+STAGE_END            => STARTED,
+      RESTART+STAGE_BEGIN       => RESTARTING,
+      RESTART+STAGE_END         => STARTED
+    }
+
+    def initialize(machineId, hostname, chassis, blade, serviceProfile, event, stage, message)
       @machineId = machineId
       @hostname = hostname
       @chassis = chassis
@@ -58,6 +86,14 @@ module Fluent::Plugin
       @serviceProfile = serviceProfile
       @stage = stage
       @message = message
+
+      eventLower = event.downcase
+      stageLower = stage.downcase
+      if MACHINE_STATES.key?(eventLower+stageLower) then
+        @state = MACHINE_STATES[eventLower+stageLower]
+      else
+        @state = UNKNOWN
+      end
     end
 
     def to_json(*a)
@@ -68,6 +104,7 @@ module Fluent::Plugin
         blade: @blade,
         serviceProfile: @serviceProfile,
         stage: @stage,
+        state: @state,
         message: @message
       }.to_json(*a)
     end
