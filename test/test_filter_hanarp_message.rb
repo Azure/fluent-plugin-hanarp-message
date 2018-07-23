@@ -82,4 +82,30 @@ class AddServiceProfile < Test::Unit::TestCase
         assert_equal nil, filtered_records[0]['machineId']
         assert_equal "1.1.1.1", filtered_records[0]['SyslogSource']
     end
+
+    def test_filter_unknown_state
+        messages = [
+            { 
+                "message" => ": 2018 Feb  9 21:07:41 GMT: %UCSM-6-EVENT: [] [FSM:BEGIN]: Soft shutdown of server sys/chassis-4/blade-7",
+                "machineId" => "Cisco_UCS:SJC2:testServiceProfile",
+                "SyslogSource" => "1.1.1.1",
+                "event" => "Unknown Event",
+                "stage" => "begin"
+            }
+        ]
+        filtered_records = filter(messages)
+        data = JSON.parse(filtered_records[0]['message'])
+        
+        assert_equal "Unknown Event", data['event']
+        assert_equal "Cisco_UCS:SJC2:testServiceProfile", data['data']['machineId']
+        assert_equal "1.1.1.1", data['data']['hostname']
+        assert_equal "4", data['data']['chassis']
+        assert_equal "7", data['data']['blade']
+        assert_equal "testServiceProfile", data['data']['serviceProfile']
+        assert_equal "begin", data['data']['stage']
+        assert_equal "unknown", data['data']['state']
+        
+        assert_equal "Cisco_UCS:SJC2:testServiceProfile", filtered_records[0]['machineId']
+        assert_equal "1.1.1.1", filtered_records[0]['SyslogSource']
+    end
 end
