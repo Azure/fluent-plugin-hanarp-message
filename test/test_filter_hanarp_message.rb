@@ -39,7 +39,8 @@ class AddServiceProfile < Test::Unit::TestCase
                 "machineId" => "Cisco_UCS:SJC2:testServiceProfile",
                 "SyslogSource" => "1.1.1.1",
                 "event" => "Soft Shutdown",
-                "stage" => "begin"
+                "stage" => "begin",
+                "executedBy" => "domain\\username"
             }
         ]
         filtered_records = filter(messages)
@@ -53,6 +54,7 @@ class AddServiceProfile < Test::Unit::TestCase
         assert_equal "testServiceProfile", data['data']['serviceProfile']
         assert_equal "begin", data['data']['stage']
         assert_equal "stopping", data['data']['state']
+        assert_equal "domain\\username", data['data']['executedBy']
         
         assert_equal "Cisco_UCS:SJC2:testServiceProfile", filtered_records[0]['machineId']
         assert_equal "1.1.1.1", filtered_records[0]['SyslogSource']
@@ -64,7 +66,8 @@ class AddServiceProfile < Test::Unit::TestCase
                 "message" => ": 2018 Feb  9 21:07:41 GMT: %UCSM-6-EVENT: [] [FSM:BEGIN]: Soft shutdown of server sys/chassis-4/blade-7",
                 "SyslogSource" => "1.1.1.1",
                 "event" => "Restart",
-                "stage" => "end"
+                "stage" => "end",
+                "executedBy" => ""
             }
         ]
         filtered_records = filter(messages)
@@ -78,6 +81,7 @@ class AddServiceProfile < Test::Unit::TestCase
         assert_equal nil, data['data']['serviceProfile']
         assert_equal "end", data['data']['stage']
         assert_equal "started", data['data']['state']
+        assert_equal "", data['data']['executedBy']
         
         assert_equal nil, filtered_records[0]['machineId']
         assert_equal "1.1.1.1", filtered_records[0]['SyslogSource']
@@ -90,7 +94,8 @@ class AddServiceProfile < Test::Unit::TestCase
                 "machineId" => "Cisco_UCS:SJC2:testServiceProfile",
                 "SyslogSource" => "1.1.1.1",
                 "event" => "Unknown Event",
-                "stage" => "begin"
+                "stage" => "begin",
+                "executedBy" => ""
             }
         ]
         filtered_records = filter(messages)
@@ -104,6 +109,7 @@ class AddServiceProfile < Test::Unit::TestCase
         assert_equal "testServiceProfile", data['data']['serviceProfile']
         assert_equal "begin", data['data']['stage']
         assert_equal "unknown", data['data']['state']
+        assert_equal "", data['data']['executedBy']
         
         assert_equal "Cisco_UCS:SJC2:testServiceProfile", filtered_records[0]['machineId']
         assert_equal "1.1.1.1", filtered_records[0]['SyslogSource']

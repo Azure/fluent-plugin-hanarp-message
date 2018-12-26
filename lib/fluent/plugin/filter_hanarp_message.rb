@@ -20,13 +20,14 @@ module Fluent::Plugin
       host = record[ucsHostNameKey]
       chassis = message[/chassis-(\d)/,1]
       blade = message[/blade-(\d)/,1]
+      executedBy = record["executedBy"]
 
       if record.key?("machineId")
         machineId = record["machineId"]
         serviceProfile = machineId.split(":")[2]
       end
 
-      d = Data.new(machineId, host, chassis, blade, serviceProfile, event, stage, message)
+      d = Data.new(machineId, host, chassis, blade, serviceProfile, event, stage, message, executedBy)
       m = Message.new(time, event, d)
       record["message"] = m.to_json
       record
@@ -78,7 +79,7 @@ module Fluent::Plugin
       RESTART+STAGE_END         => STARTED
     }
 
-    def initialize(machineId, hostname, chassis, blade, serviceProfile, event, stage, message)
+    def initialize(machineId, hostname, chassis, blade, serviceProfile, event, stage, message, executedBy)
       @machineId = machineId
       @hostname = hostname
       @chassis = chassis
@@ -86,6 +87,7 @@ module Fluent::Plugin
       @serviceProfile = serviceProfile
       @stage = stage
       @message = message
+      @executedBy = executedBy
 
       eventLower = event.downcase
       stageLower = stage.downcase
@@ -105,7 +107,8 @@ module Fluent::Plugin
         serviceProfile: @serviceProfile,
         stage: @stage,
         state: @state,
-        message: @message
+        message: @message,
+        executedBy: @executedBy
       }.to_json(*a)
     end
   end
