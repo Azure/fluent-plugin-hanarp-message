@@ -32,3 +32,7 @@ Message format:
     }
 
 Plugin currently only expects syslog messages with either [FSM:BEGIN] or [FSM:END] tags and Power-on, Soft shutdown, Hard shutdown, or Power-cycle in the message. Please use the grep plugin to filter those messages out.
+
+## Trademarks 
+
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow Microsoft's Trademark & Brand Guidelines. Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party's policies.
